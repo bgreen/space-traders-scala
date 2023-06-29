@@ -12,43 +12,26 @@
 package spacetraders.core
 
 import spacetraders.model._
-import org.json4s._
-import sttp.client3.json4s.SttpJson4sApi
-import scala.reflect.ClassTag
+import io.circe.{Decoder, Encoder}
+import io.circe.generic.AutoDerivation
+import sttp.client3.circe.SttpCirceApi
 
-object JsonSupport extends SttpJson4sApi {
-  def enumSerializers: Seq[Serializer[_]] = Seq[Serializer[_]]() :+
-    new EnumNameSerializer(FactionSymbols) :+
-    new EnumNameSerializer(ShipNavFlightMode) :+
-    new EnumNameSerializer(ShipNavStatus) :+
-    new EnumNameSerializer(ShipRole) :+
-    new EnumNameSerializer(ShipType) :+
-    new EnumNameSerializer(SystemType) :+
-    new EnumNameSerializer(TradeSymbol) :+
-    new EnumNameSerializer(WaypointType)
+object JsonSupport extends SttpCirceApi with AutoDerivation with DateSerializers with AdditionalTypeSerializers {
 
-  private class EnumNameSerializer[E <: Enumeration: ClassTag](enumeration: E) extends Serializer[E#Value] {
-    import JsonDSL._
-    val EnumerationClass: Class[E#Value] = classOf[E#Value]
-
-    def deserialize(implicit format: Formats): PartialFunction[(TypeInfo, JValue), E#Value] = {
-      case (t @ TypeInfo(EnumerationClass, _), json) if isValid(json) =>
-        json match {
-          case JString(value) => enumeration.withName(value)
-          case value => throw new MappingException(s"Can't convert $value to $EnumerationClass")
-        }
-    }
-
-    private[this] def isValid(json: JValue) = json match {
-      case JString(value) if enumeration.values.exists(_.toString == value) => true
-      case _ => false
-    }
-
-    def serialize(implicit format: Formats): PartialFunction[Any, JValue] = {
-      case i: E#Value => i.toString
-      }
-    }
-
-  implicit val format: Formats = DefaultFormats ++ enumSerializers ++ DateSerializers.all ++ AdditionalTypeSerializers.all
-  implicit val serialization: org.json4s.Serialization = org.json4s.jackson.Serialization
+  implicit val FactionSymbolsDecoder: Decoder[FactionSymbols.FactionSymbols] = Decoder.decodeEnumeration(FactionSymbols)
+  implicit val FactionSymbolsEncoder: Encoder[FactionSymbols.FactionSymbols] = Encoder.encodeEnumeration(FactionSymbols)
+  implicit val ShipNavFlightModeDecoder: Decoder[ShipNavFlightMode.ShipNavFlightMode] = Decoder.decodeEnumeration(ShipNavFlightMode)
+  implicit val ShipNavFlightModeEncoder: Encoder[ShipNavFlightMode.ShipNavFlightMode] = Encoder.encodeEnumeration(ShipNavFlightMode)
+  implicit val ShipNavStatusDecoder: Decoder[ShipNavStatus.ShipNavStatus] = Decoder.decodeEnumeration(ShipNavStatus)
+  implicit val ShipNavStatusEncoder: Encoder[ShipNavStatus.ShipNavStatus] = Encoder.encodeEnumeration(ShipNavStatus)
+  implicit val ShipRoleDecoder: Decoder[ShipRole.ShipRole] = Decoder.decodeEnumeration(ShipRole)
+  implicit val ShipRoleEncoder: Encoder[ShipRole.ShipRole] = Encoder.encodeEnumeration(ShipRole)
+  implicit val ShipTypeDecoder: Decoder[ShipType.ShipType] = Decoder.decodeEnumeration(ShipType)
+  implicit val ShipTypeEncoder: Encoder[ShipType.ShipType] = Encoder.encodeEnumeration(ShipType)
+  implicit val SystemTypeDecoder: Decoder[SystemType.SystemType] = Decoder.decodeEnumeration(SystemType)
+  implicit val SystemTypeEncoder: Encoder[SystemType.SystemType] = Encoder.encodeEnumeration(SystemType)
+  implicit val TradeSymbolDecoder: Decoder[TradeSymbol.TradeSymbol] = Decoder.decodeEnumeration(TradeSymbol)
+  implicit val TradeSymbolEncoder: Encoder[TradeSymbol.TradeSymbol] = Encoder.encodeEnumeration(TradeSymbol)
+  implicit val WaypointTypeDecoder: Decoder[WaypointType.WaypointType] = Decoder.decodeEnumeration(WaypointType)
+  implicit val WaypointTypeEncoder: Encoder[WaypointType.WaypointType] = Encoder.encodeEnumeration(WaypointType)
 }
