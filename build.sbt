@@ -1,6 +1,6 @@
 val scala3Version = "3.3.0"
 val sttpVersion = "3.8.15"
-val circeVersion = "0.4.1"
+val circeVersion = "0.14.1"
 val json4sVersion = "3.6.11"
 
 lazy val root = project
@@ -22,7 +22,7 @@ lazy val app = project
     //libraryDependencies += "org.scalameta" %% "munit" % "0.7.29" % Test,
 
     //libraryDependencies += ("org.openapitools" % "openapi-client" % "1.0.1") cross CrossVersion.for3Use2_13
-    //libraryDependencies += ("org.json4s" %% "json4s-jackson" % "3.6.11") cross CrossVersion.for3Use2_13
+    libraryDependencies += ("org.json4s" %% "json4s-jackson" % "3.6.11") cross CrossVersion.for3Use2_13
     
   )
 
@@ -37,15 +37,12 @@ lazy val sdk = project
     crossScalaVersions := Seq(scalaVersion.value, "2.12.17"),
 
     libraryDependencies ++= Seq(
-      "com.softwaremill.sttp.client3" %% "core",
-      "com.softwaremill.sttp.client3" %% "circe"
-    ).map(_ % sttpVersion),
-
-    libraryDependencies ++= Seq(
-      "io.circe" %% "circe-core",
-      "io.circe" %% "circe-generic",
-      "io.circe" %% "circe-parser"
-    ).map(_ % circeVersion),
+      "com.softwaremill.sttp.client3" %% "core" % sttpVersion,
+      "com.softwaremill.sttp.client3" %% "circe" % sttpVersion,
+      "io.circe" %% "circe-core" % circeVersion,
+      "io.circe" %% "circe-generic" % circeVersion,
+      "io.circe" %% "circe-parser" % circeVersion
+    ),
 
     scalacOptions := Seq(
       "-unchecked",
